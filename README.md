@@ -157,6 +157,22 @@ Fix faces works on the face, not the frame. H3 Face Track + Crop follows the fac
 
 The swap workflows are built by the scripts in `workflows/build/`: `oneclick_single_build.js` (Simple), `oneclick_advanced_build.js` (Advanced; set `globalThis.H3_MAX_QUALITY = true` first for One pass per person), and `oneclick_object_build.js`. To rebuild one, open ComfyUI in the browser with an empty workflow tab (each script clears the active tab), run `const app = window.comfyAPI.app.app;` in the developer console, paste the script, enable its optional groups (hat fix, No lip-sync) where the export needs them, export **Workflow (API)** and replace the matching `workflows/*.api.json`. Fix faces is written by `python workflows/build/openjutsu_face_build.py`. If node ids change, update `NODES` in `lib/simple.ts`. `npm test` checks the pruning against the exports.
 
+## A backend instead of ComfyUI
+
+`POST /api/provider` hands the source video and the character photo to a generation backend over HTTP, so a hosted service can run the swap instead of a local ComfyUI. Set both variables in `.env.local`:
+
+```sh
+SWAP_API_URL=https://example.com/swap   # the backend that makes the video
+SWAP_API_KEY=                           # sent as Authorization, if the backend wants one
+```
+
+The upload arrives as `multipart/form-data` with the `video` and `picture` parts, plus `prompt` and `resolution`, and the backend answers with either the finished video (`{"url": "..."}`) or a job to poll (`{"id": "..."}`, then `GET {SWAP_API_URL}/{id}` answering `{"status": "succeeded", "url": "..."}`). Every other route still uses ComfyUI; this replaces the swap alone.
+
+```sh
+curl -F video=@clip.mp4 -F picture=@me.png http://127.0.0.1:3000/api/provider
+# -> {"url": "https://.../result.mp4"}
+```
+
 ## Deploy on the Comfy Developer Platform
 
 Not tested yet. The app code does not change, only `.env.local`:
