@@ -15,6 +15,10 @@ export type Template = {
       layout_frame_end: string;
       plate_compose_prompt_start: string;
       plate_compose_prompt_end: string;
+      source_video: string;
+      depth_video_short: string;
+      director_prompt_short: string;
+      aspect_ratio?: string;
     };
     input_slots: { key: string; guide_three_view_url?: string }[];
   };
