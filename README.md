@@ -173,6 +173,22 @@ curl -F video=@clip.mp4 -F picture=@me.png http://127.0.0.1:3000/api/provider
 # -> {"url": "https://.../result.mp4"}
 ```
 
+## NOIZ template plates
+
+A NOIZ studio template (`action.api_kind: video_edit_whole_role_20261028`) renders from two composed plates: the template's layout frame supplies pose and framing, the two character photos supply identity. `POST /api/plate` draws one of them.
+
+```sh
+NOIZ_TEMPLATE=/path/to/hotel_lobby_whole_role_v4_TEST_LIVE.json
+MULTI_COMPOSITE_GEMINI_API_KEY=        # the variable NOIZ's own worker reads
+NOIZ_PLATE_MODEL=gemini-3-pro-image    # optional
+```
+
+```sh
+curl -F layout=start -F p1=@me.jpg -F p2=@friend.jpg -o plate.jpg http://127.0.0.1:3000/api/plate
+```
+
+`layout` is `start` or `end`, and an optional `scene` photo overrides the template's setting, as the template's own prompts describe. The video render itself is still the template's worker; this route only makes the plates it starts and ends on.
+
 ## Deploy on the Comfy Developer Platform
 
 Not tested yet. The app code does not change, only `.env.local`:
